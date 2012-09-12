@@ -1,12 +1,12 @@
 {
-    "name": "marks-int-the-box",
+    "name": "marks-in-the-box",
     "version": "1.0",
     "manifest_version": 2,
     "description": "Sync your chrome bookmarks in dropbox",
     "permissions": [
-        "bookmarks", "tabs", "http://cdnjs.cloudflare.com/"
+        "bookmarks"
         ],
-    "background": {
-        "scripts": ["background.js"]
-    }
+	"background": {
+        "page": "background.html"
+	}
 }
