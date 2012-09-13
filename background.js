@@ -1,32 +1,41 @@
 (function() {
-
-	//Bookmarks stuff
-	chrome.bookmarks.onCreated.addListener(function() {
-		chrome.bookmarks.getTree(function(bookmarks){
-			listBookmarks(bookmarks[0]);
-		});
-	});
+	chrome.tabs.create({ url: "auth.html" });
 	
-	function listBookmarks(bookmark) {
-		var concatLinks = '';
+	var saveToDropbox = function() {
+		chrome.bookmarks.getTree(function(bookmarks){
+			var t = "";
+			var content = listBookmarks(bookmarks[0], t);
+			var client = new Dropbox.Client({
+		    	key: "d8idp2skkk9yri8", secret: "gyf9wz31f4e7y3x", sandbox: true
+			});
+		    client.authDriver = new Dropbox.Drivers.Redirect({ rememberUser: true });
+			client.authenticate();
+			client.writeFile("bookmarks.txt", content, function(error, stat) {
+				if (error) {
+					console.log("error=" + error);
+					return;
+				}
+			});
+		});
+	};
+	
+	var listBookmarks = function(bookmark, concatLinks) {
 		if (bookmark.children) {
 			for (var i = 0; i < bookmark.children.length; i++) {
-				listBookmarks(bookmark.children[i]);
+				concatLinks += listBookmarks(bookmark.children[i]);
 			}
 		}
 		else {
-			concatLinks =concatLinks.concat('||', bookmark.url);
-			//console.log(concatLinks);
+			concatLinks += bookmark.url + '\n';
 		}
+		return concatLinks;
 	};
 	
-	chrome.windows.onCreated.addListener(function() {
-		//Start loggin procedure
-		var client = new Dropbox.Client({
-			key: "d8idp2skkk9yri8", secret: "gyf9wz31f4e7y3x", sandbox: true
-		});
-		console.log("Dropbox Client created");
-		client.authDriver(new Dropbox.Drivers.Redirect());
-	});
-
+	
+	chrome.bookmarks.onCreated.addListener(saveToDropbox);
+	chrome.bookmarks.onRemoved.addListener(saveToDropbox);
+	chrome.bookmarks.onChanged.addListener(saveToDropbox);
+	chrome.bookmarks.onMoved.addListener(saveToDropbox);
+	chrome.bookmarks.onChildrenReordered.addListener(saveToDropbox);
+	chrome.bookmarks.onImportEnded.addListener(saveToDropbox);
 })();

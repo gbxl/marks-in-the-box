@@ -1,12 +1,21 @@
 {
-    "name": "marks-in-the-box",
-    "version": "1.0",
-    "manifest_version": 2,
-    "description": "Sync your chrome bookmarks in dropbox",
-    "permissions": [
-        "bookmarks"
-        ],
-	"background": {
-        "page": "background.html"
-	}
+  "name": "marks-in-the-box",
+  "description": "Save your bookmarks in Dropbox",
+  "version": "0.1",
+  "manifest_version": 2,
+  "background": {
+    "scripts": [
+      "jquery.js",
+	  "dropbox.js",
+      "background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.dropbox.com/1/oauth/authorize"],
+      "js": ["dropbox.js", "content_script.js" ],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": ["https://*.dropbox.com/", "tabs", "bookmarks"]
 }
