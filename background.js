@@ -32,7 +32,6 @@
 		return concatLinks;
 	};
 	
-	
 	chrome.bookmarks.onCreated.addListener(saveToDropbox);
 	chrome.bookmarks.onRemoved.addListener(saveToDropbox);
 	chrome.bookmarks.onChanged.addListener(saveToDropbox);
