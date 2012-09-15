@@ -1,26 +1,25 @@
-(function(undefined) {
+(function() {
 	var client = new Dropbox.Client({
     	key: "d8idp2skkk9yri8", secret: "gyf9wz31f4e7y3x", sandbox: true
 	});
-    client.authDriver = new Dropbox.Drivers.Redirect({ rememberUser: true });
 	
-	client.authenticate();	
-	client.getUserInfo(function(error, userInfo) {
-	  if (error) {
-		  console.log("erreur");
-		  return;
-	  }
-	  $("body").html("Hello, " + userInfo.name + "!");
-	});
+	var unlink = function() {
+		client.signOut(function() {
+			window.location.reload();
+		});
+	};
 	
-	client.writeFile("hello_world.txt", "tg!\n", function(error, stat) {
-	  if (error) {
-		  console.log("error=" + error);
-	    return;
-	  }
-	  $("body").append("put file ok");
-	  setTimeout(function() { 
-		  chrome.tabs.getCurrent(function(tab){ chrome.tabs.remove([tab.id]); });
-	  }, 3000);
-	});
+	var link = function() {
+	    client.authDriver = new Dropbox.Drivers.Redirect({ rememberUser: true });
+		client.authenticate(function() {
+			client.getUserInfo(function(error, userData){
+				$("#info").html("Successfully linked to Dropbox as " + userData.name);
+				$("#info").append("<input id='logout' type='button' value='unlink' />");
+				$("#logout").click(unlink);
+				
+			});
+		}); // TODO add errors handling
+	};
+	
+	link();
 })();

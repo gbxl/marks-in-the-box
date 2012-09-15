@@ -9,12 +9,13 @@
 		    	key: "d8idp2skkk9yri8", secret: "gyf9wz31f4e7y3x", sandbox: true
 			});
 		    client.authDriver = new Dropbox.Drivers.Redirect({ rememberUser: true });
-			client.authenticate();
-			client.writeFile("bookmarks.txt", content, function(error, stat) {
-				if (error) {
-					console.log("error=" + error);
-					return;
-				}
+			client.authenticate(function() {
+				client.writeFile("bookmarks.txt", content, function(error, stat) {
+					if (error) {
+						console.log("error=" + error);
+						return;
+					}
+				});
 			});
 		});
 	};

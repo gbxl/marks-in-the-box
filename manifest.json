@@ -10,12 +10,5 @@
       "background.js"
     ]
   },
-  "content_scripts": [
-    {
-      "matches": ["https://www.dropbox.com/1/oauth/authorize"],
-      "js": ["dropbox.js", "content_script.js" ],
-      "run_at": "document_idle"
-    }
-  ],
   "permissions": ["https://*.dropbox.com/", "tabs", "bookmarks"]
 }
