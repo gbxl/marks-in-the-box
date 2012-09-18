@@ -13,6 +13,11 @@ Installation
 - Click the Load unpacked extension button. A file dialog appears.
 In the file dialog, navigate to the previously downloaded folder and click OK.
 
+Notice: this version is still in development and we haven't requested the
+production status on Dropbox yet. That means that if you want to try it, you
+need to create an app on Dropbox and change the App key/secret pair in
+'auth.js'. Feel free to contact us if you need more info.
+
 Development
 ---------------------
 ### Current state

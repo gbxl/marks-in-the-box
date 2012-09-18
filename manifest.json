@@ -1,14 +1,11 @@
 {
-  "name": "marks-in-the-box",
-  "description": "Save your bookmarks in Dropbox",
-  "version": "0.1",
-  "manifest_version": 2,
-  "background": {
-    "scripts": [
-	  "dropbox.js",
-      "background.js"
-    ]
-  },
-  "options_page": "options.html",
-  "permissions": ["https://*.dropbox.com/", "tabs", "bookmarks"]
+    "name": "marks-in-the-box",
+    "description": "Save your bookmarks in Dropbox",
+    "version": "0.1",
+    "manifest_version": 2,
+    "background": {
+        "scripts": [ "dropbox.js", "auth.js", "background.js" ]
+    },
+    "options_page": "options.html",
+    "permissions": ["https://*.dropbox.com/", "tabs", "bookmarks"]
 }

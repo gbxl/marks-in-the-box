@@ -1,11 +1,12 @@
 (function() {
-    var client = new Dropbox.Client({
-        key: "d8idp2skkk9yri8", secret: "gyf9wz31f4e7y3x", sandbox: true
-    });
-
 	chrome.tabs.create({ url: "options.html" });
 	
 	var saveToDropbox = function() {
+
+        if (client.dropboxUid == null) {
+            return;
+        }
+
 		chrome.bookmarks.getTree(function(bookmarks){
 			var t = "";
 			var content = listBookmarks(bookmarks[0], t);
@@ -33,12 +34,6 @@
 		return concatLinks;
 	};
 
-	var unlink = function() {
-		client.signOut(function() {
-			window.location.reload();
-		});
-	};
-	
 	chrome.bookmarks.onCreated.addListener(saveToDropbox);
 	chrome.bookmarks.onRemoved.addListener(saveToDropbox);
 	chrome.bookmarks.onChanged.addListener(saveToDropbox);
