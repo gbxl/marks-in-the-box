@@ -1,13 +1,14 @@
 (function() {
-	chrome.tabs.create({ url: "auth.html" });
+    var client = new Dropbox.Client({
+        key: "d8idp2skkk9yri8", secret: "gyf9wz31f4e7y3x", sandbox: true
+    });
+
+	chrome.tabs.create({ url: "options.html" });
 	
 	var saveToDropbox = function() {
 		chrome.bookmarks.getTree(function(bookmarks){
 			var t = "";
 			var content = listBookmarks(bookmarks[0], t);
-			var client = new Dropbox.Client({
-		    	key: "d8idp2skkk9yri8", secret: "gyf9wz31f4e7y3x", sandbox: true
-			});
 		    client.authDriver = new Dropbox.Drivers.Redirect({ rememberUser: true });
 			client.authenticate(function() {
 				client.writeFile("bookmarks.txt", content, function(error, stat) {
@@ -30,6 +31,12 @@
 			concatLinks += bookmark.url + '\n';
 		}
 		return concatLinks;
+	};
+
+	var unlink = function() {
+		client.signOut(function() {
+			window.location.reload();
+		});
 	};
 	
 	chrome.bookmarks.onCreated.addListener(saveToDropbox);

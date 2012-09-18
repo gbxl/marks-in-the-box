@@ -5,10 +5,10 @@
   "manifest_version": 2,
   "background": {
     "scripts": [
-      "jquery.js",
 	  "dropbox.js",
       "background.js"
     ]
   },
+  "options_page": "options.html",
   "permissions": ["https://*.dropbox.com/", "tabs", "bookmarks"]
 }
