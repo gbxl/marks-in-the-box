@@ -7,10 +7,11 @@ var marksInTheBox = {
     // interface to localStorage
     settings: {
         defaults : {
-            scheduleSave: true,
+            scheduledSync: true,
             timeInterval: 1,
-            autoSave: false,
+            autoSync: false,
             lastUpload: 0,
+            bookmarksModified: false, // we keep this flag in case the browser is quit
         },
 
         // get an option from localStorage, or from the defaults if it doesn't
@@ -33,6 +34,31 @@ var marksInTheBox = {
             }
         },
 
+        useAutoSync: function() {
+            this.set('scheduledSync', false);
+            this.set('autoSync', true);
+            this.set('timeInterval', 0);
+            if (marksInTheBox.timerSet == true) {
+                chrome.alarms.clear('marksInTheBoxAlarm');
+                marksInTheBox.timerSet = false;
+            }
+        },
+
+        useScheduledSync: function(time) {
+            this.set('scheduledSync', true);
+            this.set('timeInterval', time);
+            this.set('autoSync', false);
+
+            if (marksInTheBox.timerSet == true) {
+                chrome.alarms.clear('marksInTheBoxAlarm');
+            } else {
+                marksInTheBox.timerSet = true;
+            }
+
+            chrome.alarms.create('marksInTheBoxAlarm', {'periodInMinutes' : marksInTheBox.settings.get('timeInterval')});
+            chrome.alarms.onAlarm.addListener(marksInTheBox.onTimeElapsed);
+        },
+
         reset: function() {
             for (var i in this.defaults) {
                 localStorage.removeItem(i);
@@ -41,24 +67,13 @@ var marksInTheBox = {
         }
     },
 
-    bookmarksModified: false,
 
     // indicates if the timer has been set or not. if yes, we have to remove it 
     // every time we change the 'timeInterval' option
     timerSet: false, 
 
-    setTimer: function() {
-        if (!this.timerSet) {
-            this.timerSet = true;
-        } else {
-            chrome.alarms.clear('marksInTheBoxAlarm');
-        }
-        chrome.alarms.create('marksInTheBoxAlarm', {'periodInMinutes' : this.settings.get('timeInterval')});
-        chrome.alarms.onAlarm.addListener(this.onTimeElapsed);
-    },
-
     onTimeElapsed: function(alarm) {
-        if (alarm.name == 'marksInTheBoxAlarm' && marksInTheBox.bookmarksModified == true) {
+        if (alarm.name == 'marksInTheBoxAlarm' && marksInTheBoxs.settings.get('bookmarksModified') == true) {
             console.log('upload scheduled');
             marksInTheBox.saveToDropbox();
         }
@@ -66,16 +81,21 @@ var marksInTheBox = {
 
     debugInfo: function() {
         console.log('--- SETTINGS OUTPUT ---');
-        console.log('scheduleSave: ' + this.settings.get('scheduleSave'));
+        console.log('scheduledSync: ' + this.settings.get('scheduledSync'));
         console.log('timeInterval: ' + this.settings.get('timeInterval'));
         console.log('bookmarksModified: ' + this.settings.get('bookmarksModified'));
-        console.log('autoSave: ' + this.settings.get('autoSave'));
+        console.log('autoSync: ' + this.settings.get('autoSync'));
         console.log('lastUpload: ' + this.settings.get('lastUpload'));
+        console.log('timerSet: ' + this.timerSet);
         console.log('--- END ---')
     },
 
     init: function() {
-        this.setTimer();
+        if (this.settings.get('useScheduledSync') == true) {
+            this.settings.useScheduledSync(this.settings.get('timeInterval'));
+        } else {
+            this.settings.useAutoSync();
+        }
         chrome.bookmarks.onCreated.addListener(this.onBookmarksModified);
         chrome.bookmarks.onRemoved.addListener(this.onBookmarksModified);
         chrome.bookmarks.onChanged.addListener(this.onBookmarksModified);
@@ -87,9 +107,9 @@ var marksInTheBox = {
 
     onBookmarksModified: function() {
         console.log('bookmarks modified');
-        marksInTheBox.bookmarksModified = true;
+        marksInTheBox.settings.set('bookmarksModified', true);
 
-        if (marksInTheBox.settings.get('autoSave') == true) {
+        if (marksInTheBox.settings.get('autoSync') == true) {
             marksInTheBox.saveToDropbox();
         }
     },

@@ -4,7 +4,12 @@
     var bgClient = chrome.extension.getBackgroundPage().marksInTheBox.client;
 
     $('#save').click(function() {
-        bgSettings.set('timeInterval', $('#updateFrequency').val());
+        var val = $('#updateFrequency').val();
+        if (val == 0) {
+            bgSettings.useAutoSync();
+        } else {
+            bgSettings.useScheduledSync(val);
+        }
     });
 
     var loadSettings = function() {
