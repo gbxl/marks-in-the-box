@@ -4,8 +4,8 @@
     "version": "0.1",
     "manifest_version": 2,
     "background": {
-        "scripts": [ "dropbox.js", "auth.js", "background.js" ]
+        "scripts": [ "dropbox.js", "background.js" ]
     },
     "options_page": "options.html",
-    "permissions": ["https://*.dropbox.com/", "tabs", "bookmarks"]
+    "permissions": ["https://*.dropbox.com/", "tabs", "bookmarks", "storage", "alarms"]
 }

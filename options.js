@@ -1,26 +1,39 @@
 (function() {
+
+    var bgSettings = chrome.extension.getBackgroundPage().marksInTheBox.settings;
+    var bgClient = chrome.extension.getBackgroundPage().marksInTheBox.client;
+
+    $('#save').click(function() {
+        bgSettings.set('timeInterval', $('#updateFrequency').val());
+    });
+
+    var loadSettings = function() {
+        $('#updateFrequency').val(bgSettings.get('timeInterval'));
+    };
 	
 	var unlink = function() {
-        if (client.dropboxUid == null) {
+        if (bgClient.dropboxUid == null) {
             return;
         }
 
-		client.signOut(function() {
+		bgClient.signOut(function() {
 			window.location.reload();
 		});
 	};
 	
 	var link = function() {
-	    client.authDriver = new Dropbox.Drivers.Redirect({ rememberUser: true });
-		client.authenticate(function() {
-			client.getUserInfo(function(error, userData){
+	    bgClient.authDriver = new Dropbox.Drivers.Redirect({ rememberUser: true });
+		bgClient.authenticate(function() {
+			bgClient.getUserInfo(function(error, userData){
 				$("#info").html("Successfully linked to Dropbox as " + userData.name);
 				$("#info").append("<input id='logout' type='button' value='unlink' />");
 				$("#logout").click(unlink);
 				
 			});
-		}); // TODO add errors handling
+		});
 	};
 	
+    loadSettings();
 	link();
+
 })();
